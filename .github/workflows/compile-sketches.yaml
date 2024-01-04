@@ -33,6 +33,9 @@ jobs:
           cli-compile-flags: |  # 警告がエラーとして扱われるので、対処しない警告はエラーから除外する
             - --build-property
             - "compiler.cpp.extra_flags= \
+              -Wno-error=char-subscripts \
+              -Wno-error=unused-variable \
+              -Wno-error=unused-but-set-variable \
               -Wno-error=type-limits"  # micro_ros_arduino側のエラーを防ぐ
           sketch-paths: |
             - TMC5072_STEP5_Straight
