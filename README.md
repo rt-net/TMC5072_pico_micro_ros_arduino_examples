@@ -1,9 +1,9 @@
-# micro-ROS Arduino examples for Pi:Co Classic3 with ADIT board
+# micro-ROS Arduino examples for Pi:Co Classic3 with TMC5072 motor driver
 
 [![Compile Sketches](https://github.com/rt-net/adit_pico_micro_ros_arduino_examples/actions/workflows/compile-sketches.yaml/badge.svg)](https://github.com/rt-net/adit_pico_micro_ros_arduino_examples/actions/workflows/compile-sketches.yaml)
 [![Lint](https://github.com/rt-net/adit_pico_micro_ros_arduino_examples/actions/workflows/lint.yaml/badge.svg)](https://github.com/rt-net/adit_pico_micro_ros_arduino_examples/actions/workflows/lint.yaml)
 
-**ADIT製モータドライバ**を搭載したPi:Co Classic3用のmicro-ROS Arduinoサンプルスケッチ集です。
+**TMC5072モータドライバIC**を搭載したPi:Co Classic3用のmicro-ROS Arduinoサンプルスケッチ集です。
 
 [オプションキット No.1 [ESP32-S3マイコンボード]](https://www.rt-shop.jp/index.php?main_page=product_info&products_id=4131)
 を搭載したPi:Co Classic3を、
