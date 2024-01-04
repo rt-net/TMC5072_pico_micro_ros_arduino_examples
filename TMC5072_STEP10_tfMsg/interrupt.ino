@@ -14,22 +14,21 @@
 
 void controlInterrupt(void)
 {
-// 直進速度と回転速度から、左右のモータ速度を求める
-    double speed_r = g_speed + g_omega * TREAD_WIDTH / 2.0;
-    double speed_l = g_speed - g_omega * TREAD_WIDTH / 2.0;
+  // 直進速度と回転速度から、左右のモータ速度を求める
+  double speed_r = g_speed + g_omega * TREAD_WIDTH / 2.0;
+  double speed_l = g_speed - g_omega * TREAD_WIDTH / 2.0;
 
-    // 制限されたモータ速度から、直進速度と回転速度を求める
-    const double forward_speed = (speed_r + speed_l) / 2.0;
-    const double omega = (speed_r - speed_l) / TREAD_WIDTH;
+  // 制限されたモータ速度から、直進速度と回転速度を求める
+  const double forward_speed = (speed_r + speed_l) / 2.0;
+  const double omega = (speed_r - speed_l) / TREAD_WIDTH;
 
-    const double UPDATE_INTERVAL = 0.001;
-    g_odom_x += forward_speed * UPDATE_INTERVAL * cos(g_odom_theta) * UPDATE_INTERVAL;
-    g_odom_y += forward_speed * UPDATE_INTERVAL * sin(g_odom_theta) * UPDATE_INTERVAL;
-    g_odom_theta += omega * UPDATE_INTERVAL;
-    g_position_r += speed_r * UPDATE_INTERVAL / (TIRE_DIAMETER * PI) * 2 * PI;
-    g_position_l -= speed_l * UPDATE_INTERVAL / (TIRE_DIAMETER * PI) * 2 * PI;
+  const double UPDATE_INTERVAL = 0.001;
+  g_odom_x += forward_speed * UPDATE_INTERVAL * cos(g_odom_theta) * UPDATE_INTERVAL;
+  g_odom_y += forward_speed * UPDATE_INTERVAL * sin(g_odom_theta) * UPDATE_INTERVAL;
+  g_odom_theta += omega * UPDATE_INTERVAL;
+  g_position_r += speed_r * UPDATE_INTERVAL / (TIRE_DIAMETER * PI) * 2 * PI;
+  g_position_l -= speed_l * UPDATE_INTERVAL / (TIRE_DIAMETER * PI) * 2 * PI;
 
-    spd_r=speed_r;
-    spd_l=speed_l;
+  spd_r = speed_r;
+  spd_l = speed_l;
 }
-

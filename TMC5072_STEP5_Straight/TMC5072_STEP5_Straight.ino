@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "stdlib.h"
 #include "SPI.h"
 #include "TMC5072.h"
+#include "stdlib.h"
 
 #define LED0 1
 #define LED1 2
@@ -57,15 +57,16 @@ double g_min_speed;
 double g_accel = 0.0;
 volatile double g_speed = MIN_SPEED;
 
-volatile bool g_motor_move = 0;;
+volatile bool g_motor_move = 0;
+;
 
 //割り込み
 //目標値の更新周期1kHz
 void IRAM_ATTR onTimer0(void)
 {
-  portENTER_CRITICAL_ISR(&g_timer_mux);//割り込み禁止
+  portENTER_CRITICAL_ISR(&g_timer_mux);  //割り込み禁止
   controlInterrupt();
-  portEXIT_CRITICAL_ISR(&g_timer_mux);//割り込み許可
+  portEXIT_CRITICAL_ISR(&g_timer_mux);  //割り込み許可
 }
 
 //Rモータの周期数割り込み
@@ -99,7 +100,6 @@ void IRAM_ATTR isrL(void)
   }
   portEXIT_CRITICAL_ISR(&g_timer_mux);  //割り込み許可
 }
-
 
 void setup()
 {
@@ -143,18 +143,15 @@ void setup()
 
   TMC5072Init();
 
-  digitalWrite(LED0,HIGH);
-  digitalWrite(LED1,HIGH);
-  digitalWrite(LED2,HIGH);
-  digitalWrite(LED3,HIGH);
+  digitalWrite(LED0, HIGH);
+  digitalWrite(LED1, HIGH);
+  digitalWrite(LED2, HIGH);
+  digitalWrite(LED3, HIGH);
   delay(500);
-  digitalWrite(LED0,LOW);
-  digitalWrite(LED1,LOW);
-  digitalWrite(LED2,LOW);
-  digitalWrite(LED3,LOW);
-
-
-
+  digitalWrite(LED0, LOW);
+  digitalWrite(LED1, LOW);
+  digitalWrite(LED2, LOW);
+  digitalWrite(LED3, LOW);
 }
 
 void loop()
@@ -163,9 +160,9 @@ void loop()
   while (digitalRead(SW_L) & digitalRead(SW_C) & digitalRead(SW_R)) {
     continue;
   }
-  if(digitalRead(SW_L)==LOW){
+  if (digitalRead(SW_L) == LOW) {
     digitalWrite(MOTOR_EN, LOW);
-    TMC5072Setting(STEPDIR);    
+    TMC5072Setting(STEPDIR);
     delay(1000);
     digitalWrite(LED0, HIGH);
     accelerate_STEPDIR(90, 350);
@@ -179,8 +176,8 @@ void loop()
     digitalWrite(LED2, LOW);
     digitalWrite(LED3, LOW);
     delay(1000);
-    digitalWrite(MOTOR_EN, HIGH);    
-  }else if(digitalRead(SW_C)==LOW){
+    digitalWrite(MOTOR_EN, HIGH);
+  } else if (digitalRead(SW_C) == LOW) {
     digitalWrite(MOTOR_EN, LOW);
     TMC5072Setting(VELOCITY);
     delay(1000);
@@ -196,24 +193,24 @@ void loop()
     digitalWrite(LED2, LOW);
     digitalWrite(LED3, LOW);
     delay(1000);
-    digitalWrite(MOTOR_EN, HIGH);  
-  }else if(digitalRead(SW_R)==LOW){
+    digitalWrite(MOTOR_EN, HIGH);
+  } else if (digitalRead(SW_R) == LOW) {
     t_TMC5072_position tmc5072_position;
-    digitalWrite(MOTOR_EN, LOW);    
+    digitalWrite(MOTOR_EN, LOW);
     TMC5072Setting(SIXPOINT);
     delay(1000);
 
-    tmc5072_position.init_speed = 10.0;//初速度[mm/s]
-    tmc5072_position.v1_speed =150.0;//加速度a1のトップスピード[mm/s]
-    tmc5072_position.a1_accel = 100;//v1までの加速度[mm/s^2]
-    tmc5072_position.vmax_speed = 350.0;//トップスビード[mm/s]
-    tmc5072_position.amax_aceel = 3000.0;//V1からvmaxまでの加速度[mm/s^2]
-    tmc5072_position.finish_speed = 20.0;//停止速度[mm/s]
-    tmc5072_position.len = 180.0*2.0;//距離[mm]
+    tmc5072_position.init_speed = 10.0;    //初速度[mm/s]
+    tmc5072_position.v1_speed = 150.0;     //加速度a1のトップスピード[mm/s]
+    tmc5072_position.a1_accel = 100;       //v1までの加速度[mm/s^2]
+    tmc5072_position.vmax_speed = 350.0;   //トップスビード[mm/s]
+    tmc5072_position.amax_aceel = 3000.0;  //V1からvmaxまでの加速度[mm/s^2]
+    tmc5072_position.finish_speed = 20.0;  //停止速度[mm/s]
+    tmc5072_position.len = 180.0 * 2.0;    //距離[mm]
 
     TMC5072Straignt(tmc5072_position);
 
     delay(1000);
-    digitalWrite(MOTOR_EN, HIGH);  
+    digitalWrite(MOTOR_EN, HIGH);
   }
 }

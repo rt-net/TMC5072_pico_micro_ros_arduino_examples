@@ -105,7 +105,6 @@ void viewAdc(void)
 
 void straightCheck(int section_check)
 {
-
   enableMotor();
   delay(1000);
 

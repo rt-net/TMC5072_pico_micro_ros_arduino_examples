@@ -20,9 +20,9 @@
 #include "parameter.h"
 
 //header for TMC5072
-#include "stdlib.h"
 #include "SPI.h"
 #include "TMC5072.h"
+#include "stdlib.h"
 double spd_r, spd_l;
 
 signed char g_mode;
@@ -44,7 +44,6 @@ void setup()
 
   disableBuzzer();
   g_mode = 1;
-
 }
 
 void loop()
@@ -64,7 +63,7 @@ void loop()
       break;
   }
   //USBのデータが来た時にダミーリードする for TMCL-IDE
-  if(Serial.available()){
+  if (Serial.available()) {
     char temp = Serial.read();
   }
   delay(1);
@@ -76,7 +75,7 @@ void execByMode(int mode)
   delay(1000);
 
   switch (mode) {
-    case 1: //左手法
+    case 1:  //左手法
       searchLefthand();
       break;
     case 2:  //足立法
@@ -128,7 +127,7 @@ void execByMode(int mode)
     case 14:
       sensorInterruptStop();
       tmcl_init();
-      while(1){
+      while (1) {
         tmcl_process();
       }
       break;

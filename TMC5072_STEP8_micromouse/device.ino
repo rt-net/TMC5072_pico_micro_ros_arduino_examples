@@ -67,7 +67,7 @@ void initAll(void)
 
   pinMode(MOTOR_EN, OUTPUT);
   disableMotor();
-  
+
   if (!SPIFFS.begin(true)) {
     while (1) {
       Serial.println("SPIFFS Mount Failed");
@@ -83,12 +83,12 @@ void initAll(void)
   g_timer1 = timerBegin(1, 80, true);
   timerAttachInterrupt(g_timer1, &onTimer1, false);
   timerAlarmWrite(g_timer1, 250, true);
-//  timerAlarmEnable(g_timer1);//TMC5072のSPI設定が終わるまで保留
+  //  timerAlarmEnable(g_timer1);//TMC5072のSPI設定が終わるまで保留
 
-//  Serial.begin(115200);
+  //  Serial.begin(115200);
   Serial.begin(921600);
 
-//モータがEnable時でないと設定が反映されない
+  //モータがEnable時でないと設定が反映されない
   enableMotor();
   TMC5072Init();
   disableMotor();
@@ -152,10 +152,7 @@ void enableMotor(void)
 {
   digitalWrite(MOTOR_EN, LOW);  //Power ON TMC5072
 }
-void disableMotor(void)
-{
-  digitalWrite(MOTOR_EN, HIGH);
-}
+void disableMotor(void) { digitalWrite(MOTOR_EN, HIGH); }
 
 //SWITCH
 unsigned char getSW(void)

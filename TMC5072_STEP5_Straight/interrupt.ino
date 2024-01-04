@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-void controlInterrupt(void)//STEP_DIR only
+void controlInterrupt(void)  //STEP_DIR only
 {
-    g_speed += g_accel;
+  g_speed += g_accel;
 
-    if (g_speed > g_max_speed) {
-      g_speed = g_max_speed;
-    }
-    if (g_speed < g_min_speed) {
-      g_speed = g_min_speed;
-    }
+  if (g_speed > g_max_speed) {
+    g_speed = g_max_speed;
+  }
+  if (g_speed < g_min_speed) {
+    g_speed = g_min_speed;
+  }
 
-    g_step_hz_l = g_step_hz_r = (unsigned short)(g_speed / PULSE);
-
+  g_step_hz_l = g_step_hz_r = (unsigned short)(g_speed / PULSE);
 }
-
