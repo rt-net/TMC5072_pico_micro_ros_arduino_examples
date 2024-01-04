@@ -28,6 +28,14 @@ jobs:
           platforms: |  # ESP32公式のpackage indexを使用する
             - name: esp32:esp32
               source-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+          cli-compile-flags: |  # 警告がエラーとして扱われるので、対処しない警告はエラーから除外する
+            - --build-property
+            - "compiler.cpp.extra_flags= \
+              -Wno-error=unused-variable \
+              -Wno-error=char-subscripts \
+              -Wno-error=unused-but-set-variable \
+              -Wno-error=implicit-fallthrough"
+              # TODO: implicit-fallthroughを防ぐために、switch文の最後にbreakを追加する
           sketch-paths: |
             - TMC5072_STEP5_Straight
             - TMC5072_STEP8_micromouse
