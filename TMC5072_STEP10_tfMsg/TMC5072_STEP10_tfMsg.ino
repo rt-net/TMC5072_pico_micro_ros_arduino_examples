@@ -33,7 +33,7 @@
 double spd_r, spd_l;
 
 geometry_msgs__msg__Twist g_msg;
-tf2_msgs__msg__TFMessage *g_tf_message;
+tf2_msgs__msg__TFMessage * g_tf_message;
 sensor_msgs__msg__JointState g_jstate;
 rosidl_runtime_c__String g_joint_name[2];
 double g_positions[2];
@@ -44,7 +44,6 @@ rclc_executor_t g_executor;
 rcl_allocator_t g_allocator;
 rclc_support_t g_support;
 rcl_node_t g_node;
-
 
 #define LED0 1
 #define LED1 2
@@ -64,7 +63,7 @@ rcl_node_t g_node;
 #define MIN_SPEED (MIN_HZ * PULSE)
 #define TREAD_WIDTH (65.0)
 
-hw_timer_t *g_timer0 = NULL;
+hw_timer_t * g_timer0 = NULL;
 
 portMUX_TYPE g_timer_mux = portMUX_INITIALIZER_UNLOCKED;
 
@@ -82,29 +81,31 @@ double g_odom_x, g_odom_y, g_odom_theta;
 t_TMC5072Mode g_TMC5072_mode;
 
 //microROS function
-#define RCCHECK(fn) \
-  { \
-    rcl_ret_t temp_rc = fn; \
+#define RCCHECK(fn)                \
+  {                                \
+    rcl_ret_t temp_rc = fn;        \
     if ((temp_rc != RCL_RET_OK)) { \
-      errorLoop(); \
-    } \
+      errorLoop();                 \
+    }                              \
   }
-#define RCSOFTCHECK(fn) \
-  { \
-    rcl_ret_t temp_rc = fn; \
+#define RCSOFTCHECK(fn)            \
+  {                                \
+    rcl_ret_t temp_rc = fn;        \
     if ((temp_rc != RCL_RET_OK)) { \
-      errorLoop(); \
-    } \
+      errorLoop();                 \
+    }                              \
   }
 
-void errorLoop() {
+void errorLoop()
+{
   while (1) {
     digitalWrite(LED0, !digitalRead(LED0));
     delay(200);
   }
 }
 
-void eulerToQuat(float x, float y, float z, double *q) {
+void eulerToQuat(float x, float y, float z, double * q)
+{
   float c1 = cos(y / 2);
   float c2 = cos(z / 2);
   float c3 = cos(x / 2);
@@ -129,16 +130,17 @@ void IRAM_ATTR onTimer0(void)
 }
 
 //twist message cb
-void subscriptionCallback(const void *msgin) {
-  const geometry_msgs__msg__Twist *g_msg = (const geometry_msgs__msg__Twist *)msgin;
+void subscriptionCallback(const void * msgin)
+{
+  const geometry_msgs__msg__Twist * g_msg = (const geometry_msgs__msg__Twist *)msgin;
 
   //linearは[m/s]の単位で入力されるのでPi:Coのシステムに合わせて[mm/s]にする
   g_speed = g_msg->linear.x * 1000.0;
   g_omega = g_msg->angular.z;
 }
 
-
-void setup() {
+void setup()
+{
   // put your setup code here, to run once:
   pinMode(LED0, OUTPUT);
   pinMode(LED1, OUTPUT);
@@ -216,7 +218,8 @@ void setup() {
   digitalWrite(MOTOR_EN, LOW);  //motor enable
 }
 
-void loop() {
+void loop()
+{
   double q[4];
   uint32_t current = micros();
 
