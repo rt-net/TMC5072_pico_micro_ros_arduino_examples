@@ -14,38 +14,45 @@
 
 void controlInterrupt(void)
 {
-  g_speed += g_accel;
 
-  if (g_speed > g_max_speed) {
-    g_speed = g_max_speed;
-  }
-  if (g_speed < g_min_speed) {
-    g_speed = g_min_speed;
-  }
+    g_speed += g_accel;
 
-  if (g_con_wall.enable == true) {
-    g_con_wall.p_error = g_con_wall.error;
-    if ((g_sen_r.is_control == true) && (g_sen_l.is_control == true)) {
-      g_con_wall.error = g_sen_r.error - g_sen_l.error;
+    if (g_speed > g_max_speed) {
+      g_speed = g_max_speed;
+    }
+    if (g_speed < g_min_speed) {
+      g_speed = g_min_speed;
+    }
+
+    if (g_con_wall.enable == true) {
+      g_con_wall.p_error = g_con_wall.error;
+      if ((g_sen_r.is_control == true) && (g_sen_l.is_control == true)) {
+        g_con_wall.error = g_sen_r.error - g_sen_l.error;
+      } else {
+        g_con_wall.error = 2.0 * (g_sen_r.error - g_sen_l.error);
+      }
+      g_con_wall.diff = g_con_wall.error - g_con_wall.p_error;
+      g_con_wall.sum += g_con_wall.error;
+      if (g_con_wall.sum > g_con_wall.sum_max) {
+        g_con_wall.sum = g_con_wall.sum_max;
+      } else if (g_con_wall.sum < (-g_con_wall.sum_max)) {
+        g_con_wall.sum = -g_con_wall.sum_max;
+      }
+      g_con_wall.control = 0.001 * g_speed * g_con_wall.kp * g_con_wall.error;
+      spd_r = g_speed + g_con_wall.control;
+      spd_l = g_speed - g_con_wall.control;
     } else {
-      g_con_wall.error = 2.0 * (g_sen_r.error - g_sen_l.error);
+      spd_r = g_speed;
+      spd_l = g_speed;
     }
-    g_con_wall.diff = g_con_wall.error - g_con_wall.p_error;
-    g_con_wall.sum += g_con_wall.error;
-    if (g_con_wall.sum > g_con_wall.sum_max) {
-      g_con_wall.sum = g_con_wall.sum_max;
-    } else if (g_con_wall.sum < (-g_con_wall.sum_max)) {
-      g_con_wall.sum = -g_con_wall.sum_max;
+    if (spd_r < MIN_SPEED) spd_r = MIN_SPEED;
+    if (spd_l < MIN_SPEED) spd_l = MIN_SPEED;
+
+    if(getTMC5072Mode()==STEPDIR){//for STEP/DIR
+        setRStepHz((unsigned short)(spd_r / PULSE));
+        setLStepHz((unsigned short)(spd_l / PULSE));
     }
-    g_con_wall.control = 0.001 * g_speed * g_con_wall.kp * g_con_wall.error;
-    spd_r = g_speed + g_con_wall.control;
-    spd_l = g_speed - g_con_wall.control;
-  } else {
-    spd_r = g_speed;
-    spd_l = g_speed;
-  }
-  if (spd_r < MIN_SPEED) spd_r = MIN_SPEED;
-  if (spd_l < MIN_SPEED) spd_l = MIN_SPEED;
+
 }
 
 void sensorInterrupt(void)
@@ -97,7 +104,7 @@ void sensorInterrupt(void)
         g_sen_l.is_wall = false;
       }
       if (g_sen_l.value > g_sen_l.th_control) {
-        g_sen_l.error = g_sen_l.value - g_sen_l.ref;
+        g_sen_l.error = g_sen_l.value -g_sen_l.ref ;
         g_sen_l.is_control = true;
       } else {
         g_sen_l.error = 0;
