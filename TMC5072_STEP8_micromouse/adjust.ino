@@ -105,7 +105,6 @@ void viewAdc(void)
 
 void straightCheck(int section_check)
 {
-
   enableMotor();
   delay(1000);
 
@@ -176,7 +175,7 @@ unsigned char execByModeAdjust(unsigned char mode)
       break;
 
     case 3:
-      TMC5072Setting(VELOCITY);    
+      TMC5072Setting(VELOCITY);
       rotationCheck();
       break;
     case 4:
@@ -190,7 +189,7 @@ unsigned char execByModeAdjust(unsigned char mode)
       break;
 
     case 6:
-      TMC5072Setting(STEPDIR);    
+      TMC5072Setting(STEPDIR);
       rotationCheck();
       break;
 

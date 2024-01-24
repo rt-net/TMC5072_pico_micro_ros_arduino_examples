@@ -15,26 +15,25 @@
 
 hw_timer_t * g_timer0 = NULL;
 hw_timer_t * g_timer1 = NULL;
-hw_timer_t * g_timer2 = NULL;//for STEP/DIR
-hw_timer_t * g_timer3 = NULL;//for STEP/DIR
+hw_timer_t * g_timer2 = NULL;  //for STEP/DIR
+hw_timer_t * g_timer3 = NULL;  //for STEP/DIR
 
-volatile unsigned short g_step_hz_r, g_step_hz_l;//for STEP/DIR
-volatile unsigned int g_step_r, g_step_l;//for STEP/DIR
+volatile unsigned short g_step_hz_r, g_step_hz_l;  //for STEP/DIR
+volatile unsigned int g_step_r, g_step_l;          //for STEP/DIR
 
 portMUX_TYPE g_timer_mux = portMUX_INITIALIZER_UNLOCKED;
 
-void setRStepHz(short data) { g_step_hz_r = data; }//for STEP/DIR
+void setRStepHz(short data) { g_step_hz_r = data; }  //for STEP/DIR
 
-void setLStepHz(short data) { g_step_hz_l = data; }//for STEP/DIR
+void setLStepHz(short data) { g_step_hz_l = data; }  //for STEP/DIR
 
-void clearStepR(void) { g_step_r = 0; }//for STEP/DIR
+void clearStepR(void) { g_step_r = 0; }  //for STEP/DIR
 
-void clearStepL(void) { g_step_l = 0; }//for STEP/DIR
+void clearStepL(void) { g_step_l = 0; }  //for STEP/DIR
 
-unsigned int getStepR(void) { return g_step_r; }//for STEP/DIR
+unsigned int getStepR(void) { return g_step_r; }  //for STEP/DIR
 
-unsigned int getStepL(void) { return g_step_l; }//for STEP/DIR
-
+unsigned int getStepL(void) { return g_step_l; }  //for STEP/DIR
 
 void IRAM_ATTR onTimer0(void)
 {
@@ -50,7 +49,7 @@ void IRAM_ATTR onTimer1(void)
   portEXIT_CRITICAL_ISR(&g_timer_mux);
 }
 
-void IRAM_ATTR isrR(void)//for STEP/DIR
+void IRAM_ATTR isrR(void)  //for STEP/DIR
 {
   portENTER_CRITICAL_ISR(&g_timer_mux);
   if (g_motor_move) {
@@ -66,7 +65,7 @@ void IRAM_ATTR isrR(void)//for STEP/DIR
   portEXIT_CRITICAL_ISR(&g_timer_mux);
 }
 
-void IRAM_ATTR isrL(void)//for STEP/DIR
+void IRAM_ATTR isrL(void)  //for STEP/DIR
 {
   portENTER_CRITICAL_ISR(&g_timer_mux);
   if (g_motor_move) {
@@ -82,24 +81,22 @@ void IRAM_ATTR isrL(void)//for STEP/DIR
   portEXIT_CRITICAL_ISR(&g_timer_mux);
 }
 
-
 void controlInterruptStart(void) { timerAlarmEnable(g_timer0); }
 void controlInterruptStop(void) { timerAlarmDisable(g_timer0); }
 
 void sensorInterruptStart(void) { timerAlarmEnable(g_timer1); }
 void sensorInterruptStop(void) { timerAlarmDisable(g_timer1); }
 
-void PWMInterruptStart(void)//for STEP/DIR
+void PWMInterruptStart(void)  //for STEP/DIR
 {
   timerAlarmEnable(g_timer2);
   timerAlarmEnable(g_timer3);
 }
-void PWMInterruptStop(void)//for STEP/DIR
+void PWMInterruptStop(void)  //for STEP/DIR
 {
   timerAlarmDisable(g_timer2);
   timerAlarmDisable(g_timer3);
 }
-
 
 void initAll(void)
 {
@@ -129,16 +126,16 @@ void initAll(void)
   digitalWrite(SLED_L, LOW);
 
   pinMode(MOTOR_EN, OUTPUT);
-  pinMode(CW_R, OUTPUT);//for STEP/DIR
-  pinMode(CW_L, OUTPUT);//for STEP/DIR
-  pinMode(PWM_R, OUTPUT);//for STEP/DIR
-  pinMode(PWM_L, OUTPUT);//for STEP/DIR
+  pinMode(CW_R, OUTPUT);   //for STEP/DIR
+  pinMode(CW_L, OUTPUT);   //for STEP/DIR
+  pinMode(PWM_R, OUTPUT);  //for STEP/DIR
+  pinMode(PWM_L, OUTPUT);  //for STEP/DIR
   disableMotor();
 
-  moveDir(MOT_FORWARD,MOT_FORWARD);//for STEP/DIR
-  digitalWrite(PWM_R, LOW);//for STEP/DIR
-  digitalWrite(PWM_L, LOW);//for STEP/DIR
-  
+  moveDir(MOT_FORWARD, MOT_FORWARD);  //for STEP/DIR
+  digitalWrite(PWM_R, LOW);           //for STEP/DIR
+  digitalWrite(PWM_L, LOW);           //for STEP/DIR
+
   if (!SPIFFS.begin(true)) {
     while (1) {
       Serial.println("SPIFFS Mount Failed");
@@ -154,22 +151,22 @@ void initAll(void)
   g_timer1 = timerBegin(1, 80, true);
   timerAttachInterrupt(g_timer1, &onTimer1, false);
   timerAlarmWrite(g_timer1, 250, true);
-//  timerAlarmEnable(g_timer1);//TMC5072のSPI設定が終わるまで保留
+  //  timerAlarmEnable(g_timer1);//TMC5072のSPI設定が終わるまで保留
 
-  g_timer2 = timerBegin(2, 40, true);//for STEP/DIR
-  timerAttachInterrupt(g_timer2, &isrR, false);//for STEP/DIR
-  timerAlarmWrite(g_timer2, 13333, true);//for STEP/DIR
-  timerAlarmEnable(g_timer2);//for STEP/DIR
+  g_timer2 = timerBegin(2, 40, true);            //for STEP/DIR
+  timerAttachInterrupt(g_timer2, &isrR, false);  //for STEP/DIR
+  timerAlarmWrite(g_timer2, 13333, true);        //for STEP/DIR
+  timerAlarmEnable(g_timer2);                    //for STEP/DIR
 
-  g_timer3 = timerBegin(3, 40, true);//for STEP/DIR
-  timerAttachInterrupt(g_timer3, &isrL, false);//for STEP/DIR
-  timerAlarmWrite(g_timer3, 13333, true);//for STEP/DIR
-  timerAlarmEnable(g_timer3);//for STEP/DIR
+  g_timer3 = timerBegin(3, 40, true);            //for STEP/DIR
+  timerAttachInterrupt(g_timer3, &isrL, false);  //for STEP/DIR
+  timerAlarmWrite(g_timer3, 13333, true);        //for STEP/DIR
+  timerAlarmEnable(g_timer3);                    //for STEP/DIR
 
-//  Serial.begin(115200);
+  //  Serial.begin(115200);
   Serial.begin(921600);
 
-//モータがEnable時でないと設定が反映されない
+  //モータがEnable時でないと設定が反映されない
   enableMotor();
   TMC5072Init();
   disableMotor();
@@ -193,8 +190,8 @@ void initAll(void)
   g_map_control.setGoalY(GOAL_Y);
 
   g_motor_move = false;
-  setRStepHz(MIN_SPEED);//for STEP/DIR
-  setLStepHz(MIN_SPEED);//for STEP/DIR
+  setRStepHz(MIN_SPEED);  //for STEP/DIR
+  setLStepHz(MIN_SPEED);  //for STEP/DIR
 
   enableBuzzer(INC_FREQ);
   delay(80);
@@ -235,12 +232,9 @@ void enableMotor(void)
 {
   digitalWrite(MOTOR_EN, LOW);  //Power ON TMC5072
 }
-void disableMotor(void)
-{
-  digitalWrite(MOTOR_EN, HIGH);
-}
+void disableMotor(void) { digitalWrite(MOTOR_EN, HIGH); }
 
-void moveDir(t_CW_CCW left_CW, t_CW_CCW right_CW)//for STEP/DIR
+void moveDir(t_CW_CCW left_CW, t_CW_CCW right_CW)  //for STEP/DIR
 {  //左右のモータの回転方向を指示する
   if (right_CW == MOT_FORWARD) {
     digitalWrite(CW_R, HIGH);
@@ -254,8 +248,6 @@ void moveDir(t_CW_CCW left_CW, t_CW_CCW right_CW)//for STEP/DIR
     digitalWrite(CW_L, LOW);
   }
 }
-
-
 
 //SWITCH
 unsigned char getSW(void)

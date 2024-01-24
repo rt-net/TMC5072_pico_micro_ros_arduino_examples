@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-void straight(int len, int init_speed, int max_speed, int finish_speed) {
+void straight(int len, int init_speed, int max_speed, int finish_speed)
+{
   if (getTMC5072Mode() == STEPDIR) {
     straightStepDir(len, init_speed, max_speed, finish_speed);
   } else {
@@ -20,7 +21,8 @@ void straight(int len, int init_speed, int max_speed, int finish_speed) {
   }
 }
 
-void straightStepDir(int len, int init_speed, int max_speed, int finish_speed) {
+void straightStepDir(int len, int init_speed, int max_speed, int finish_speed)
+{
   int obj_step;
   controlInterruptStop();
   g_max_speed = max_speed;
@@ -28,8 +30,8 @@ void straightStepDir(int len, int init_speed, int max_speed, int finish_speed) {
 
   if (init_speed < MIN_SPEED) {
     g_speed = MIN_SPEED;
-      clearStepR();
-      clearStepL();
+    clearStepR();
+    clearStepL();
   } else {
     g_speed = init_speed;
   }
@@ -54,7 +56,8 @@ void straightStepDir(int len, int init_speed, int max_speed, int finish_speed) {
 
   g_motor_move = 1;
 
-  while ((len - (getStepR() + getStepL()) / 2.0 * PULSE) > (((g_speed * g_speed) - (finish_speed * finish_speed)) / (2.0 * 1000.0 * SEARCH_ACCEL))) {
+  while ((len - (getStepR() + getStepL()) / 2.0 * PULSE) >
+         (((g_speed * g_speed) - (finish_speed * finish_speed)) / (2.0 * 1000.0 * SEARCH_ACCEL))) {
     continue;
   }
 
@@ -76,7 +79,8 @@ void straightStepDir(int len, int init_speed, int max_speed, int finish_speed) {
   }
 }
 
-void straightVelocity(int len, int init_speed, int max_speed, int finish_speed) {
+void straightVelocity(int len, int init_speed, int max_speed, int finish_speed)
+{
   int obj_step;
   controlInterruptStop();
   g_max_speed = max_speed;
@@ -114,8 +118,10 @@ void straightVelocity(int len, int init_speed, int max_speed, int finish_speed) 
 
   g_motor_move = 1;
 
-  while (len - (abs((int)TMC5072Read_no_status(TMC5072_XACTUAL1)) + abs((int)TMC5072Read_no_status(TMC5072_XACTUAL2))) / 2.0 * TMC5072_PULSE
-         > (((g_speed * g_speed) - (finish_speed * finish_speed)) / (2.0 * 1000.0 * SEARCH_ACCEL))) {
+  while (len - (abs((int)TMC5072Read_no_status(TMC5072_XACTUAL1)) +
+                abs((int)TMC5072Read_no_status(TMC5072_XACTUAL2))) /
+                 2.0 * TMC5072_PULSE >
+         (((g_speed * g_speed) - (finish_speed * finish_speed)) / (2.0 * 1000.0 * SEARCH_ACCEL))) {
     TMC5072Write(TMC5072_VMAX1, spd_r / TMC5072_VELOCITY);
     TMC5072Write(TMC5072_VMAX2, spd_l / TMC5072_VELOCITY);
     delay(1);
@@ -123,7 +129,8 @@ void straightVelocity(int len, int init_speed, int max_speed, int finish_speed) 
 
   g_accel = -1.0 * SEARCH_ACCEL;
 
-  while ((abs((int)TMC5072Read_no_status(TMC5072_XACTUAL1)) + abs((int)TMC5072Read_no_status(TMC5072_XACTUAL2))) < obj_step) {
+  while ((abs((int)TMC5072Read_no_status(TMC5072_XACTUAL1)) +
+          abs((int)TMC5072Read_no_status(TMC5072_XACTUAL2))) < obj_step) {
     TMC5072Write(TMC5072_VMAX1, spd_r / TMC5072_VELOCITY);
     TMC5072Write(TMC5072_VMAX2, spd_l / TMC5072_VELOCITY);
     delay(1);
@@ -143,7 +150,8 @@ void straightVelocity(int len, int init_speed, int max_speed, int finish_speed) 
   }
 }
 
-void accelerate(int len, int finish_speed) {
+void accelerate(int len, int finish_speed)
+{
   if (getTMC5072Mode() == STEPDIR) {
     accelerateStepDir(len, finish_speed);
   } else {
@@ -151,7 +159,8 @@ void accelerate(int len, int finish_speed) {
   }
 }
 
-void accelerateStepDir(int len, int finish_speed) {
+void accelerateStepDir(int len, int finish_speed)
+{
   int obj_step;
 
   controlInterruptStop();
@@ -181,7 +190,8 @@ void accelerateStepDir(int len, int finish_speed) {
   controlInterruptStart();
 }
 
-void accelerateVelocity(int len, int finish_speed) {
+void accelerateVelocity(int len, int finish_speed)
+{
   int obj_step;
 
   controlInterruptStop();
@@ -201,7 +211,8 @@ void accelerateVelocity(int len, int finish_speed) {
   obj_step = (int)((float)len * 2.0 / TMC5072_PULSE);
   controlInterruptStart();
 
-  while ((abs((int)TMC5072Read_no_status(TMC5072_XACTUAL1)) + abs((int)TMC5072Read_no_status(TMC5072_XACTUAL2))) < obj_step) {
+  while ((abs((int)TMC5072Read_no_status(TMC5072_XACTUAL1)) +
+          abs((int)TMC5072Read_no_status(TMC5072_XACTUAL2))) < obj_step) {
     TMC5072Write(TMC5072_VMAX1, spd_r / TMC5072_VELOCITY);
     TMC5072Write(TMC5072_VMAX2, spd_l / TMC5072_VELOCITY);
     delay(1);
@@ -216,9 +227,8 @@ void accelerateVelocity(int len, int finish_speed) {
   controlInterruptStart();
 }
 
-
-
-void oneStep(int len, int tar_speed) {
+void oneStep(int len, int tar_speed)
+{
   if (getTMC5072Mode() == STEPDIR) {
     oneStepStepDir(len, tar_speed);
   } else {
@@ -226,7 +236,8 @@ void oneStep(int len, int tar_speed) {
   }
 }
 
-void oneStepStepDir(int len, int tar_speed) {
+void oneStepStepDir(int len, int tar_speed)
+{
   int obj_step;
   controlInterruptStop();
   g_speed = g_min_speed = g_max_speed = tar_speed;
@@ -251,18 +262,19 @@ void oneStepStepDir(int len, int tar_speed) {
   controlInterruptStart();
 }
 
-void oneStepVelocity(int len, int tar_speed) {
+void oneStepVelocity(int len, int tar_speed)
+{
   int obj_step;
   controlInterruptStop();
   g_speed = g_min_speed = g_max_speed = tar_speed;
   g_accel = 0.0;
   g_con_wall.enable = true;
 
-
   obj_step = (int)((float)len * 2.0 / TMC5072_PULSE);
   controlInterruptStart();
 
-  while ((abs((int)TMC5072Read_no_status(TMC5072_XACTUAL1)) + abs((int)TMC5072Read_no_status(TMC5072_XACTUAL2))) < obj_step) {
+  while ((abs((int)TMC5072Read_no_status(TMC5072_XACTUAL1)) +
+          abs((int)TMC5072Read_no_status(TMC5072_XACTUAL2))) < obj_step) {
     TMC5072Write(TMC5072_VMAX1, spd_r / TMC5072_VELOCITY);
     TMC5072Write(TMC5072_VMAX2, spd_l / TMC5072_VELOCITY);
     delay(1);
@@ -277,9 +289,8 @@ void oneStepVelocity(int len, int tar_speed) {
   controlInterruptStart();
 }
 
-
-
-void decelerate(int len, int tar_speed) {
+void decelerate(int len, int tar_speed)
+{
   if (getTMC5072Mode() == STEPDIR) {
     decelerateStepDir(len, tar_speed);
   } else {
@@ -287,7 +298,8 @@ void decelerate(int len, int tar_speed) {
   }
 }
 
-void decelerateStepDir(int len, int tar_speed) {
+void decelerateStepDir(int len, int tar_speed)
+{
   int obj_step;
   controlInterruptStop();
   g_max_speed = tar_speed;
@@ -301,7 +313,8 @@ void decelerateStepDir(int len, int tar_speed) {
   moveDir(MOT_FORWARD, MOT_FORWARD);
   controlInterruptStart();
 
-  while ((len - (getStepR() + getStepL()) / 2.0 * PULSE) > (((g_speed * g_speed) - (MIN_SPEED * MIN_SPEED)) / (2.0 * 1000.0 * SEARCH_ACCEL))) {
+  while ((len - (getStepR() + getStepL()) / 2.0 * PULSE) >
+         (((g_speed * g_speed) - (MIN_SPEED * MIN_SPEED)) / (2.0 * 1000.0 * SEARCH_ACCEL))) {
     continue;
   }
 
@@ -317,7 +330,8 @@ void decelerateStepDir(int len, int tar_speed) {
   delay(300);
 }
 
-void decelerateVelocity(int len, int tar_speed) {
+void decelerateVelocity(int len, int tar_speed)
+{
   int obj_step;
   controlInterruptStop();
   g_max_speed = tar_speed;
@@ -327,8 +341,10 @@ void decelerateVelocity(int len, int tar_speed) {
 
   obj_step = (int)((float)len * 2.0 / TMC5072_PULSE);
   controlInterruptStart();
-  while (len - (abs((int)TMC5072Read_no_status(TMC5072_XACTUAL1)) + abs((int)TMC5072Read_no_status(TMC5072_XACTUAL2))) / 2.0 * TMC5072_PULSE
-         > (((g_speed * g_speed) - (MIN_SPEED * MIN_SPEED)) / (2.0 * 1000.0 * SEARCH_ACCEL))) {
+  while (len - (abs((int)TMC5072Read_no_status(TMC5072_XACTUAL1)) +
+                abs((int)TMC5072Read_no_status(TMC5072_XACTUAL2))) /
+                 2.0 * TMC5072_PULSE >
+         (((g_speed * g_speed) - (MIN_SPEED * MIN_SPEED)) / (2.0 * 1000.0 * SEARCH_ACCEL))) {
     TMC5072Write(TMC5072_VMAX1, spd_r / TMC5072_VELOCITY);
     TMC5072Write(TMC5072_VMAX2, spd_l / TMC5072_VELOCITY);
     delay(1);
@@ -336,7 +352,8 @@ void decelerateVelocity(int len, int tar_speed) {
   g_accel = -1.0 * SEARCH_ACCEL;
   g_min_speed = MIN_SPEED;
 
-  while ((abs((int)TMC5072Read_no_status(TMC5072_XACTUAL1)) + abs((int)TMC5072Read_no_status(TMC5072_XACTUAL2))) < obj_step) {
+  while ((abs((int)TMC5072Read_no_status(TMC5072_XACTUAL1)) +
+          abs((int)TMC5072Read_no_status(TMC5072_XACTUAL2))) < obj_step) {
     TMC5072Write(TMC5072_VMAX1, spd_r / TMC5072_VELOCITY);
     TMC5072Write(TMC5072_VMAX2, spd_l / TMC5072_VELOCITY);
     delay(1);
@@ -349,8 +366,6 @@ void decelerateVelocity(int len, int tar_speed) {
   delay(300);
 }
 
-
-
 void rotate(t_direction dir, int times)  //姿勢制御がないためvelocity-modeでなくpostion-mode
 {
   if (getTMC5072Mode() == STEPDIR) {
@@ -360,7 +375,8 @@ void rotate(t_direction dir, int times)  //姿勢制御がないためvelocity-m
   }
 }
 
-void rotateStepDir(t_direction dir, int times) {
+void rotateStepDir(t_direction dir, int times)
+{
   int obj_step;
   controlInterruptStop();
   g_max_speed = SEARCH_SPEED;
@@ -388,7 +404,8 @@ void rotateStepDir(t_direction dir, int times) {
   }
   controlInterruptStart();
 
-  while (((obj_step - (getStepR() + getStepL())) / 2.0 * PULSE) > (((g_speed * g_speed) - (MIN_SPEED * MIN_SPEED)) / (2.0 * 1000.0 * TURN_ACCEL))) {
+  while (((obj_step - (getStepR() + getStepL())) / 2.0 * PULSE) >
+         (((g_speed * g_speed) - (MIN_SPEED * MIN_SPEED)) / (2.0 * 1000.0 * TURN_ACCEL))) {
     continue;
   }
 
@@ -432,8 +449,10 @@ void rotateVelocity(t_direction dir, int times)  //姿勢制御がないためve
   obj_step = (int)(TREAD_WIDTH * PI / 4.0 * (float)times * 2.0 / TMC5072_PULSE);
   controlInterruptStart();
 
-  while (((obj_step - (abs((int)TMC5072Read_no_status(TMC5072_XACTUAL1)) + abs((int)TMC5072Read_no_status(TMC5072_XACTUAL2)))) / 2.0 * TMC5072_PULSE)
-         > (((g_speed * g_speed) - (MIN_SPEED * MIN_SPEED)) / (2.0 * 1000.0 * TURN_ACCEL))) {
+  while (((obj_step - (abs((int)TMC5072Read_no_status(TMC5072_XACTUAL1)) +
+                       abs((int)TMC5072Read_no_status(TMC5072_XACTUAL2)))) /
+          2.0 * TMC5072_PULSE) >
+         (((g_speed * g_speed) - (MIN_SPEED * MIN_SPEED)) / (2.0 * 1000.0 * TURN_ACCEL))) {
     TMC5072Write(TMC5072_VMAX1, spd_r / TMC5072_VELOCITY);
     TMC5072Write(TMC5072_VMAX2, spd_l / TMC5072_VELOCITY);
     delay(1);
@@ -441,7 +460,8 @@ void rotateVelocity(t_direction dir, int times)  //姿勢制御がないためve
 
   g_accel = -1.0 * TURN_ACCEL;
 
-  while ((abs((int)TMC5072Read_no_status(TMC5072_XACTUAL1)) + abs((int)TMC5072Read_no_status(TMC5072_XACTUAL2))) < obj_step) {
+  while ((abs((int)TMC5072Read_no_status(TMC5072_XACTUAL1)) +
+          abs((int)TMC5072Read_no_status(TMC5072_XACTUAL2))) < obj_step) {
     TMC5072Write(TMC5072_VMAX1, spd_r / TMC5072_VELOCITY);
     TMC5072Write(TMC5072_VMAX2, spd_l / TMC5072_VELOCITY);
     delay(1);
