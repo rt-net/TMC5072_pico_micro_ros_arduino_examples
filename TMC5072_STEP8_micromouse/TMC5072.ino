@@ -19,6 +19,10 @@
 
 int shadowRegister[0x80] = {0};
 
+t_TMC5072Mode g_TMC5072_mode;
+
+t_TMC5072Mode getTMC5072Mode(void) { return g_TMC5072_mode; }
+
 unsigned int TMC5072Read_no_status(unsigned char add)
 {
   unsigned char data[5];
@@ -110,6 +114,7 @@ void TMC5072Write(unsigned char add, unsigned int writedata)
 
 void TMC5072Setting(t_TMC5072Mode mode)
 {
+  g_TMC5072_mode = mode;
   switch (mode) {
     case STEPDIR:  //Ramp Generator velocity-modeに近い使い方
       TMC5072Write(TMC5072_IHOLD_IRUN1, 0x00071703);  //IHOLDDELAY=7 IRUN=17/32 IHOLD=3/32

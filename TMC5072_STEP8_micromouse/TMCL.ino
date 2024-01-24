@@ -15,175 +15,173 @@
 #include "TMC5072.h"
 #include "stdio.h"
 
+// clang-format off
+
 // these addresses are fixed
-#define SERIAL_MODULE_ADDRESS 1
-#define SERIAL_HOST_ADDRESS 2
+#define SERIAL_MODULE_ADDRESS  1
+#define SERIAL_HOST_ADDRESS    2
 
 const int BUILD_VERSION = 30824;
-const char * VersionString = "0016V308";
-#define ID_TMC5072 7
+const char *VersionString = "0016V308";
+#define ID_TMC5072         7
 #define TMC_ADDRESS_MASK 0x7F
 #define TMC_ADDRESS(x) ((x) & (TMC_ADDRESS_MASK))
-#define CAST_Sn_TO_S32(value, n) \
-  ((value) | (((value) & ((uint32_t)1 << ((n)-1))) ? ~(((uint32_t)1 << (n)) - 1) : 0))
+#define CAST_Sn_TO_S32(value, n) ((value) | (((value) & ((uint32_t)1<<((n)-1)))? ~(((uint32_t)1<<(n))-1) : 0 ))
 
 // id detection state definitions
-#define ID_STATE_WAIT_LOW 0   // id detection waiting for first edge (currently low)
-#define ID_STATE_WAIT_HIGH 1  // id detection waiting for second edge (currently high)
-#define ID_STATE_DONE 2       // id detection finished successfully
-#define ID_STATE_INVALID \
-  3  // id detection failed - we got an answer, but no corresponding ID (invalid ID pulse length)
-#define ID_STATE_NO_ANSWER 4  // id detection failed - board doesn't answer
-#define ID_STATE_TIMEOUT 5    // id detection failed - board id pulse went high but not low
-#define ID_STATE_NOT_IN_FW \
-  6  // id detection detected a valid id that is not supported in this firmware
+#define ID_STATE_WAIT_LOW   0  // id detection waiting for first edge (currently low)
+#define ID_STATE_WAIT_HIGH  1  // id detection waiting for second edge (currently high)
+#define ID_STATE_DONE       2  // id detection finished successfully
+#define ID_STATE_INVALID    3  // id detection failed - we got an answer, but no corresponding ID (invalid ID pulse length)
+#define ID_STATE_NO_ANSWER  4  // id detection failed - board doesn't answer
+#define ID_STATE_TIMEOUT    5  // id detection failed - board id pulse went high but not low
+#define ID_STATE_NOT_IN_FW  6  // id detection detected a valid id that is not supported in this firmware
 
 // todo CHECK 2: these are unused - delete? (LH) #11
 // tmcl interpreter states
-#define TM_IDLE 0
-#define TM_RUN 1
-#define TM_STEP 2
-#define TM_RESET 3  // unused
-#define TM_DOWNLOAD 4
-#define TM_DEBUG 5  // wie TM_IDLE, es wird jedoch der Akku nicht modifiziert bei GAP etc.
+#define TM_IDLE      0
+#define TM_RUN       1
+#define TM_STEP      2
+#define TM_RESET     3 // unused
+#define TM_DOWNLOAD  4
+#define TM_DEBUG     5 // wie TM_IDLE, es wird jedoch der Akku nicht modifiziert bei GAP etc.
 
 // todo CHECK 2: these are unused - delete? (LH) #12
-#define TCS_IDLE 0
-#define TCS_CAN7 1
-#define TCS_CAN8 2
-#define TCS_UART 3
-#define TCS_UART_ERROR 4
-#define TCS_UART_II 5
-#define TCS_UART_II_ERROR 6
-#define TCS_USB 7
-#define TCS_USB_ERROR 8
-#define TCS_MEM 9
+#define TCS_IDLE           0
+#define TCS_CAN7           1
+#define TCS_CAN8           2
+#define TCS_UART           3
+#define TCS_UART_ERROR     4
+#define TCS_UART_II        5
+#define TCS_UART_II_ERROR  6
+#define TCS_USB            7
+#define TCS_USB_ERROR      8
+#define TCS_MEM            9
 
 // TMCL commands
-#define TMCL_ROR 1
-#define TMCL_ROL 2
-#define TMCL_MST 3
-#define TMCL_MVP 4
-#define TMCL_SAP 5
-#define TMCL_GAP 6
-#define TMCL_STAP 7
-#define TMCL_RSAP 8
-#define TMCL_SGP 9
-#define TMCL_GGP 10
-#define TMCL_STGP 11
-#define TMCL_RSGP 12
-#define TMCL_RFS 13
-#define TMCL_SIO 14
-#define TMCL_GIO 15
-#define TMCL_CALC 19
-#define TMCL_COMP 20
-#define TMCL_JC 21
-#define TMCL_JA 22
-#define TMCL_CSUB 23
-#define TMCL_RSUB 24
-#define TMCL_EI 25
-#define TMCL_DI 26
-#define TMCL_WAIT 27
-#define TMCL_STOP 28
-#define TMCL_SAC 29
-#define TMCL_SCO 30
-#define TMCL_GCO 31
-#define TMCL_CCO 32
-#define TMCL_CALCX 33
-#define TMCL_AAP 34
-#define TMCL_AGP 35
-#define TMCL_CLE 36
-#define TMCL_VECT 37
-#define TMCL_RETI 38
-#define TMCL_ACO 39
+#define TMCL_ROR                     1 
+#define TMCL_ROL                     2 
+#define TMCL_MST                     3 
+#define TMCL_MVP                     4
+#define TMCL_SAP                     5
+#define TMCL_GAP                     6
+#define TMCL_STAP                    7
+#define TMCL_RSAP                    8
+#define TMCL_SGP                     9
+#define TMCL_GGP                     10
+#define TMCL_STGP                    11
+#define TMCL_RSGP                    12
+#define TMCL_RFS                     13
+#define TMCL_SIO                     14
+#define TMCL_GIO                     15
+#define TMCL_CALC                    19
+#define TMCL_COMP                    20
+#define TMCL_JC                      21
+#define TMCL_JA                      22
+#define TMCL_CSUB                    23
+#define TMCL_RSUB                    24
+#define TMCL_EI                      25
+#define TMCL_DI                      26
+#define TMCL_WAIT                    27
+#define TMCL_STOP                    28
+#define TMCL_SAC                     29
+#define TMCL_SCO                     30
+#define TMCL_GCO                     31
+#define TMCL_CCO                     32
+#define TMCL_CALCX                   33
+#define TMCL_AAP                     34
+#define TMCL_AGP                     35
+#define TMCL_CLE                     36
+#define TMCL_VECT                    37
+#define TMCL_RETI                    38
+#define TMCL_ACO                     39
 
-#define TMCL_UF0 64
-#define TMCL_UF1 65
-#define TMCL_UF2 66
-#define TMCL_UF3 67
-#define TMCL_UF4 68
-#define TMCL_UF5 69
-#define TMCL_UF6 70
-#define TMCL_UF7 71
-#define TMCL_UF8 72
+#define TMCL_UF0                     64
+#define TMCL_UF1                     65
+#define TMCL_UF2                     66
+#define TMCL_UF3                     67
+#define TMCL_UF4                     68
+#define TMCL_UF5                     69
+#define TMCL_UF6                     70
+#define TMCL_UF7                     71
+#define TMCL_UF8                     72
 
-#define TMCL_ApplStop 128
-#define TMCL_ApplRun 129
-#define TMCL_ApplStep 130
-#define TMCL_ApplReset 131
-#define TMCL_DownloadStart 132
-#define TMCL_DownloadEnd 133
-#define TMCL_ReadMem 134
-#define TMCL_GetStatus 135
-#define TMCL_GetVersion 136
-#define TMCL_FactoryDefault 137
-#define TMCL_SetEvent 138
-#define TMCL_SetASCII 139
-#define TMCL_SecurityCode 140
-#define TMCL_Breakpoint 141
-#define TMCL_RamDebug 142
-#define TMCL_GetIds 143
-#define TMCL_UF_CH1 144
-#define TMCL_UF_CH2 145
-#define TMCL_writeRegisterChannel_1 146
-#define TMCL_writeRegisterChannel_2 147
-#define TMCL_readRegisterChannel_1 148
-#define TMCL_readRegisterChannel_2 149
+#define TMCL_ApplStop                128
+#define TMCL_ApplRun                 129
+#define TMCL_ApplStep                130
+#define TMCL_ApplReset               131
+#define TMCL_DownloadStart           132
+#define TMCL_DownloadEnd             133
+#define TMCL_ReadMem                 134
+#define TMCL_GetStatus               135
+#define TMCL_GetVersion              136
+#define TMCL_FactoryDefault          137
+#define TMCL_SetEvent                138
+#define TMCL_SetASCII                139
+#define TMCL_SecurityCode            140
+#define TMCL_Breakpoint              141
+#define TMCL_RamDebug                142
+#define TMCL_GetIds                  143
+#define TMCL_UF_CH1                  144
+#define TMCL_UF_CH2                  145
+#define TMCL_writeRegisterChannel_1  146
+#define TMCL_writeRegisterChannel_2  147
+#define TMCL_readRegisterChannel_1   148
+#define TMCL_readRegisterChannel_2   149
 
-#define TMCL_BoardMeasuredSpeed 150
-#define TMCL_BoardError 151
-#define TMCL_BoardReset 152
+#define TMCL_BoardMeasuredSpeed      150
+#define TMCL_BoardError              151
+#define TMCL_BoardReset              152
 
-#define TMCL_WLAN 160
-#define TMCL_WLAN_CMD 160
-#define TMCL_WLAN_IS_RTS 161
-#define TMCL_WLAN_CMDMODE_EN 162
-#define TMCL_WLAN_IS_CMDMODE 163
+#define TMCL_WLAN                    160
+#define TMCL_WLAN_CMD                160
+#define TMCL_WLAN_IS_RTS             161
+#define TMCL_WLAN_CMDMODE_EN         162
+#define TMCL_WLAN_IS_CMDMODE         163
 
-#define TMCL_MIN 170
-#define TMCL_MAX 171
-#define TMCL_OTP 172
+#define TMCL_MIN                     170
+#define TMCL_MAX                     171
+#define TMCL_OTP                     172
 
-#define TMCL_Boot 242
-#define TMCL_SoftwareReset 255
+#define TMCL_Boot                    242
+#define TMCL_SoftwareReset           255
 
 // Command type variants
-#define MVP_ABS 0
-#define MVP_REL 1
-#define MVP_PRF 2
+#define MVP_ABS  0
+#define MVP_REL  1
+#define MVP_PRF  2
 
 // GetVersion() Format types
-#define VERSION_FORMAT_ASCII 0
-#define VERSION_FORMAT_BINARY 1
-#define VERSION_BOOTLOADER \
-  2  // todo CHECK 2: implemented this way in IDE - probably means getting the bootloader version. Not implemented in firmware (LH)
-#define VERSION_SIGNATURE \
-  3  // todo CHECK 2: implemented under "Signature" in IDE. Not sure what to return for that. Not implemented in firmware (LH)
-#define VERSION_BOARD_DETECT_SRC \
-  4  // todo CHECK 2: This doesn't really fit under GetVersion, but its implemented there in the IDE - change or leave this way? (LH)
-#define VERSION_BUILD 5
+#define VERSION_FORMAT_ASCII      0
+#define VERSION_FORMAT_BINARY     1
+#define VERSION_BOOTLOADER        2 // todo CHECK 2: implemented this way in IDE - probably means getting the bootloader version. Not implemented in firmware (LH)
+#define VERSION_SIGNATURE         3 // todo CHECK 2: implemented under "Signature" in IDE. Not sure what to return for that. Not implemented in firmware (LH)
+#define VERSION_BOARD_DETECT_SRC  4 // todo CHECK 2: This doesn't really fit under GetVersion, but its implemented there in the IDE - change or leave this way? (LH)
+#define VERSION_BUILD             5
 
 //Statuscodes
-#define REPLY_OK 100
-#define REPLY_CMD_LOADED 101
-#define REPLY_CHKERR 1
-#define REPLY_INVALID_CMD 2
-#define REPLY_INVALID_TYPE 3
-#define REPLY_INVALID_VALUE 4
-#define REPLY_EEPROM_LOCKED 5
-#define REPLY_CMD_NOT_AVAILABLE 6
-#define REPLY_CMD_LOAD_ERROR 7
-#define REPLY_WRITE_PROTECTED 8
-#define REPLY_MAX_EXCEEDED 9
-#define REPLY_DOWNLOAD_NOT_POSSIBLE 10
-#define REPLY_CHIP_READ_FAILED 11
-#define REPLY_DELAYED 128
-#define REPLY_ACTIVE_COMM 129
+#define REPLY_OK                     100
+#define REPLY_CMD_LOADED             101
+#define REPLY_CHKERR                 1
+#define REPLY_INVALID_CMD            2
+#define REPLY_INVALID_TYPE           3
+#define REPLY_INVALID_VALUE          4
+#define REPLY_EEPROM_LOCKED          5
+#define REPLY_CMD_NOT_AVAILABLE      6
+#define REPLY_CMD_LOAD_ERROR         7
+#define REPLY_WRITE_PROTECTED        8
+#define REPLY_MAX_EXCEEDED           9
+#define REPLY_DOWNLOAD_NOT_POSSIBLE  10
+#define REPLY_CHIP_READ_FAILED       11
+#define REPLY_DELAYED                128
+#define REPLY_ACTIVE_COMM            129
 
 // TMCL communication status
-#define TMCL_RX_ERROR_NONE 0
-#define TMCL_RX_ERROR_NODATA 1
-#define TMCL_RX_ERROR_CHECKSUM 2
+#define TMCL_RX_ERROR_NONE      0
+#define TMCL_RX_ERROR_NODATA    1
+#define TMCL_RX_ERROR_CHECKSUM  2
+
+// clang-format on
 
 uint32_t vmax_position[2];
 

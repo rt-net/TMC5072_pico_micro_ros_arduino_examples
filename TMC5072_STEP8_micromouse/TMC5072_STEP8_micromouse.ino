@@ -76,9 +76,11 @@ void execByMode(int mode)
 
   switch (mode) {
     case 1:  //左手法
+      TMC5072Setting(VELOCITY);
       searchLefthand();
       break;
     case 2:  //足立法
+      TMC5072Setting(VELOCITY);
       g_map_control.positionInit();
       searchAdachi(g_map_control.getGoalX(), g_map_control.getGoalY());
       rotate(right, 2);
@@ -92,6 +94,7 @@ void execByMode(int mode)
       mapWrite();
       break;
     case 3:  //最短走行
+      TMC5072Setting(VELOCITY);
       copyMap();
       g_map_control.positionInit();
       fastRun(g_map_control.getGoalX(), g_map_control.getGoalY());
@@ -105,10 +108,36 @@ void execByMode(int mode)
       g_map_control.nextDir(right);
       break;
     case 4:
+      TMC5072Setting(STEPDIR);
+      searchLefthand();
       break;
-    case 5:
+    case 5:  //足立法
+      TMC5072Setting(STEPDIR);
+      g_map_control.positionInit();
+      searchAdachi(g_map_control.getGoalX(), g_map_control.getGoalY());
+      rotate(right, 2);
+      g_map_control.nextDir(right);
+      g_map_control.nextDir(right);
+      goalAppeal();
+      searchAdachi(0, 0);
+      rotate(right, 2);
+      g_map_control.nextDir(right);
+      g_map_control.nextDir(right);
+      mapWrite();
       break;
-    case 6:
+    case 6:  //最短走行
+      TMC5072Setting(STEPDIR);
+      copyMap();
+      g_map_control.positionInit();
+      fastRun(g_map_control.getGoalX(), g_map_control.getGoalY());
+      rotate(right, 2);
+      g_map_control.nextDir(right);
+      g_map_control.nextDir(right);
+      goalAppeal();
+      fastRun(0, 0);
+      rotate(right, 2);
+      g_map_control.nextDir(right);
+      g_map_control.nextDir(right);
       break;
     case 7:
       break;

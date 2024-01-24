@@ -46,6 +46,11 @@ void controlInterrupt(void)
   }
   if (spd_r < MIN_SPEED) spd_r = MIN_SPEED;
   if (spd_l < MIN_SPEED) spd_l = MIN_SPEED;
+
+  if (getTMC5072Mode() == STEPDIR) {  //for STEP/DIR
+    setRStepHz((unsigned short)(spd_r / PULSE));
+    setLStepHz((unsigned short)(spd_l / PULSE));
+  }
 }
 
 void sensorInterrupt(void)

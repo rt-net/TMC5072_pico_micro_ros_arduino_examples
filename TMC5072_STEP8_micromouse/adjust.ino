@@ -170,10 +170,12 @@ unsigned char execByModeAdjust(unsigned char mode)
       viewAdc();
       break;
     case 2:
+      TMC5072Setting(VELOCITY);
       straightCheck(3);
       break;
 
     case 3:
+      TMC5072Setting(VELOCITY);
       rotationCheck();
       break;
     case 4:
@@ -182,9 +184,13 @@ unsigned char execByModeAdjust(unsigned char mode)
       break;
 
     case 5:
+      TMC5072Setting(STEPDIR);
+      straightCheck(3);
       break;
 
     case 6:
+      TMC5072Setting(STEPDIR);
+      rotationCheck();
       break;
 
     default:
